@@ -1,4 +1,4 @@
-package org.lwjglb.engine.scene;
+package org.relunluck.engine.scene;
 
 import org.joml.Matrix4f;
 

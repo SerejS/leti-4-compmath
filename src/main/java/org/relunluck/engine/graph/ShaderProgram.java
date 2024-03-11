@@ -1,7 +1,7 @@
-package org.lwjglb.engine.graph;
+package org.relunluck.engine.graph;
 
 import org.lwjgl.opengl.GL30;
-import org.lwjglb.engine.Utils;
+import org.relunluck.engine.Utils;
 
 import java.util.*;
 

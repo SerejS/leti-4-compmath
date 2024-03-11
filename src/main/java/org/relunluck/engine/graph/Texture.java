@@ -1,4 +1,4 @@
-package org.lwjglb.engine.graph;
+package org.relunluck.engine.graph;
 
 import org.lwjgl.system.MemoryStack;
 

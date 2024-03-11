@@ -1,8 +1,8 @@
-package org.lwjglb.engine.graph;
+package org.relunluck.engine.graph;
 
 import org.lwjgl.opengl.GL;
-import org.lwjglb.engine.Window;
-import org.lwjglb.engine.scene.Scene;
+import org.relunluck.engine.Window;
+import org.relunluck.engine.scene.Scene;
 
 import static org.lwjgl.opengl.GL11.*;
 

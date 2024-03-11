@@ -1,7 +1,7 @@
-package org.lwjglb.engine;
+package org.relunluck.engine;
 
-import org.lwjglb.engine.graph.Render;
-import org.lwjglb.engine.scene.Scene;
+import org.relunluck.engine.graph.Render;
+import org.relunluck.engine.scene.Scene;
 
 public interface IAppLogic {
 

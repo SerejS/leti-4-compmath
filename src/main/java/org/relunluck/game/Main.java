@@ -1,9 +1,9 @@
-package org.lwjglb.game;
+package org.relunluck.game;
 
 import org.joml.*;
-import org.lwjglb.engine.*;
-import org.lwjglb.engine.graph.*;
-import org.lwjglb.engine.scene.*;
+import org.relunluck.engine.*;
+import org.relunluck.engine.graph.*;
+import org.relunluck.engine.scene.*;
 
 import java.lang.Math;
 import java.util.*;

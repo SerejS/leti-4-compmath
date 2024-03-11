@@ -1,6 +1,6 @@
-package org.lwjglb.engine.scene;
+package org.relunluck.engine.scene;
 
-import org.lwjglb.engine.graph.*;
+import org.relunluck.engine.graph.*;
 
 import java.util.*;
 
