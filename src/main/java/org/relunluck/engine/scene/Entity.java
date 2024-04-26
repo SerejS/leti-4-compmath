@@ -1,22 +1,24 @@
 package org.relunluck.engine.scene;
 
-import org.joml.*;
+import org.joml.Matrix4d;
+import org.joml.Quaterniond;
+import org.joml.Vector3d;
 
 public class Entity {
 
     private final String id;
     private final String modelId;
-    private Matrix4f modelMatrix;
-    private Vector3f position;
-    private Quaternionf rotation;
-    private float scale;
+    private Matrix4d modelMatrix;
+    private Vector3d position;
+    private Quaterniond rotation;
+    private double scale;
 
     public Entity(String id, String modelId) {
         this.id = id;
         this.modelId = modelId;
-        modelMatrix = new Matrix4f();
-        position = new Vector3f();
-        rotation = new Quaternionf();
+        modelMatrix = new Matrix4d();
+        position = new Vector3d();
+        rotation = new Quaterniond();
         scale = 1;
     }
 
@@ -28,33 +30,33 @@ public class Entity {
         return modelId;
     }
 
-    public Matrix4f getModelMatrix() {
+    public Matrix4d getModelMatrix() {
         return modelMatrix;
     }
 
-    public Vector3f getPosition() {
+    public Vector3d getPosition() {
         return position;
     }
 
-    public Quaternionf getRotation() {
+    public Quaterniond getRotation() {
         return rotation;
     }
 
-    public float getScale() {
+    public double getScale() {
         return scale;
     }
 
-    public final void setPosition(float x, float y, float z) {
+    public final void setPosition(double x, double y, double z) {
         position.x = x;
         position.y = y;
         position.z = z;
     }
 
-    public void setRotation(float x, float y, float z, float angle) {
+    public void setRotation(double x, double y, double z, double angle) {
         this.rotation.fromAxisAngleRad(x, y, z, angle);
     }
 
-    public void setScale(float scale) {
+    public void setScale(double scale) {
         this.scale = scale;
     }
 

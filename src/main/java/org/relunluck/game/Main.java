@@ -14,8 +14,8 @@ public class Main implements IAppLogic {
 
     private Entity cubeEntity;
     private int time_pos = 0;
-    private Vector4f displInc = new Vector4f();
-    private float rotation;
+    private Vector4d displInc = new Vector4d();
+    private double rotation;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -30,7 +30,7 @@ public class Main implements IAppLogic {
 
     @Override
     public void init(Window window, Scene scene, Render render) {
-        float[] positions = new float[]{
+        double[] positions = new double[]{
                 // V0
                 -0.5f, 0.5f, 0.5f,
                 // V1
@@ -80,7 +80,7 @@ public class Main implements IAppLogic {
                 // V19: V2 repeated
                 0.5f, -0.5f, 0.5f,
         };
-        float[] textCoords = new float[]{ // Texture
+        double[] textCoords = new double[]{ // Texture
                 0.0f, 0.0f,
                 0.0f, 0.5f,
                 0.5f, 0.5f,
@@ -181,7 +181,7 @@ public class Main implements IAppLogic {
 
         displInc.mul(diffTimeMillis / 1000.0f);
 
-        Vector3f entityPos = cubeEntity.getPosition();
+        Vector3d entityPos = cubeEntity.getPosition();
         cubeEntity.setPosition(displInc.x + entityPos.x, displInc.y + entityPos.y, displInc.z + entityPos.z);
         cubeEntity.setScale(cubeEntity.getScale() + displInc.w);*/
     }
@@ -191,12 +191,12 @@ public class Main implements IAppLogic {
         rotation = (rotation + 1.5f * 4) % 360;
         time_pos++;
 
-        float radius = 0.7f;
-        float speed = 0.05f;
-        float x = radius * (float) sin((float) time_pos * speed);
-        float y = radius * (float) cos((float) time_pos * speed);
+        double radius = 0.7f;
+        double speed = 0.05f;
+        double x = radius * sin(time_pos * speed);
+        double y = radius * cos(time_pos * speed);
 //        rotation = (rotation + additive) % 360;
-        cubeEntity.setRotation(1, 1, 0, (float) Math.toRadians(rotation));
+        cubeEntity.setRotation(1, 1, 0, Math.toRadians(rotation));
         cubeEntity.setPosition(2 * x, y, y - 10 * radius);
         cubeEntity.updateModelMatrix();
     }

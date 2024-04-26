@@ -14,7 +14,7 @@ public class Mesh {
     private int vaoId;
     private List<Integer> vboIdList;
 
-    public Mesh(float[] positions, float[] textCoords, int[] indices) {
+    public Mesh(double[] positions, double[] textCoords, int[] indices) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             numVertices = indices.length;
             vboIdList = new ArrayList<>();
@@ -25,22 +25,22 @@ public class Mesh {
             // Positions VBO
             int vboId = glGenBuffers();
             vboIdList.add(vboId);
-            FloatBuffer positionsBuffer = stack.callocFloat(positions.length);
+            DoubleBuffer positionsBuffer = stack.callocDouble(positions.length);
             positionsBuffer.put(0, positions);
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, positionsBuffer, GL_STATIC_DRAW);
             glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+            glVertexAttribPointer(0, 3, GL_DOUBLE, false, 0, 0);
 
             // Texture coordinates VBO
             vboId = glGenBuffers();
             vboIdList.add(vboId);
-            FloatBuffer textCoordsBuffer = stack.callocFloat(textCoords.length);
+            DoubleBuffer textCoordsBuffer = stack.callocDouble(textCoords.length);
             textCoordsBuffer.put(0, textCoords);
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, textCoordsBuffer, GL_STATIC_DRAW);
             glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+            glVertexAttribPointer(1, 2, GL_DOUBLE, false, 0, 0);
 
             // Index VBO
             vboId = glGenBuffers();
