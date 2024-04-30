@@ -56,6 +56,10 @@ public class Entity {
         this.rotation.fromAxisAngleRad(x, y, z, angle);
     }
 
+    public void setRotation(Quaterniond q) {
+        this.rotation = q;
+    }
+
     public void setScale(double scale) {
         this.scale = scale;
     }

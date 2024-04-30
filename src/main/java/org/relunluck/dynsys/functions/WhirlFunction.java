@@ -10,6 +10,8 @@ public class WhirlFunction implements Function<Quaterniond> {
     @Override
     public Quaterniond calculate(double t, Quaterniond x) {
         Quaterniond res = new Quaterniond();
-        return x.mul( w.x, w.y, w.z, 0, res).mul(new Quaterniond(0, 0, 0, 0.5));
+        x.mul( w.x, w.y, w.z, 0, res);
+        return res.mul(new Quaterniond(0, 0, 0, 0.5));
+
     }
 }

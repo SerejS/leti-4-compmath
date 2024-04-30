@@ -38,12 +38,18 @@ public class SystemModeler {
             next.getDynamicState().changeI(next.getConstState());
             buffer.add(next);
             state = next;
+            next.getDynamicState().appendT(step);
             t += step;
             if (calcPointPosition(state.getConstState().getPseudo_plane(), state.getDynamicState().getX()) <= 0){
+                System.out.println("Calced: " + calcPointPosition(state.getConstState().getPseudo_plane(), state.getDynamicState().getX()));
+                System.out.println("Before: " + next.getDynamicState().getX());
                 Vector3d v = getLowestVertex(state);
                 if (v != null){
+                    System.out.println(next.getDynamicState().getX());
+                    System.out.println("Ded in side");
                     modelingContact(v);
                 }
+                System.out.println("After: " + next.getDynamicState().getW());
             }
         }
     }
@@ -54,15 +60,20 @@ public class SystemModeler {
         double mind = 0;
         Vector3d res = null;
         for(int i = 0; i < 8; i++) {
-            Vector3d v = new Vector3d(R.get(i, 0), R.get(i, 1), R.get(i, 2)).add(state.getDynamicState().getX());
+            Vector3d v = new Vector3d(R.get(0, i), R.get(1, i), R.get(2, i)).add(state.getDynamicState().getX());
             double d = calcPointPosition(state.getConstState().getPlane(), v);
             if (d < mind) {
                 res = new Vector3d(v);
                 mind = d;
             }
+            if (d == mind && res != null) {
+                res.add(v);
+                res.mul(0.5);
+            }
         }
         return res;
     }
+
 
     public static double calcPointPosition(Vector4d plane, Vector3d x){
         return plane.dot(x.x, x.y, x.z, 1);
@@ -87,5 +98,9 @@ public class SystemModeler {
         tmp2 = I_inv.mult(new SimpleMatrix(new double[][]{{tmp1.x}, {tmp1.y}, {tmp1.z}}));
         Vector3d dw = new Vector3d(tmp2.get(0,0), tmp2.get(1,0), tmp2.get(2, 0));
         state.getDynamicState().getW().add(dw);
+    }
+
+    public StateBuffer getBuffer() {
+        return buffer;
     }
 }

@@ -3,6 +3,7 @@ package org.relunluck.dynsys.state;
 import org.ejml.simple.SimpleMatrix;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
+import org.relunluck.dynsys.SystemModeler;
 
 public class DynamicState {
     double t;
@@ -47,8 +48,8 @@ public class DynamicState {
         tmp1 = q.y * q.z;
         tmp2 = q.x * q.w;
 
-        res.set(3, 0, 2.0 * (tmp1 + tmp2));
-        res.set(0, 3, 2.0 * (tmp1 - tmp2));
+        res.set(2, 1, 2.0 * (tmp1 + tmp2));
+        res.set(1, 2, 2.0 * (tmp1 - tmp2));
 
         return res;
     }
@@ -64,9 +65,14 @@ public class DynamicState {
         SimpleMatrix R_inv = R.invert();
         this.I = R.mult(cstate.getI_body()).mult(R_inv);
         this.I_inv = R.mult(cstate.getI_body_inv()).mult(R_inv);
+
+        if (SystemModeler.calcPointPosition(cstate.getPlane(), x) < 0) {
+            cstate.getPlane().mul(-1);
+            cstate.getPseudo_plane().mul(-1);
+        }
     }
 
-    public void changeI(ConstState cstate){
+    public void changeI(ConstState cstate) {
         SimpleMatrix R = quatToMatrix(q);
         SimpleMatrix R_inv = R.transpose();
         this.I = R.mult(cstate.getI_body()).mult(R_inv);
@@ -75,6 +81,10 @@ public class DynamicState {
 
     public double getT() {
         return t;
+    }
+
+    public void appendT(double diff) {
+        this.t += diff;
     }
 
     public Quaterniond getQ() {

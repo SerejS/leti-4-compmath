@@ -1,6 +1,13 @@
 package org.relunluck.game;
 
 import org.joml.*;
+import org.relunluck.dynsys.SystemModeler;
+import org.relunluck.dynsys.SystemState;
+import org.relunluck.dynsys.state.ConstState;
+import org.relunluck.dynsys.state.DynamicState;
+import org.relunluck.dynsys.state.StateBuffer;
+import org.relunluck.dynsys.stepper.RK4_Quat;
+import org.relunluck.dynsys.stepper.RK4_Vector3;
 import org.relunluck.engine.*;
 import org.relunluck.engine.graph.*;
 import org.relunluck.engine.scene.*;
@@ -13,9 +20,7 @@ import static java.lang.Math.*;
 public class Main implements IAppLogic {
 
     private Entity cubeEntity;
-    private int time_pos = 0;
-    private Vector4d displInc = new Vector4d();
-    private double rotation;
+    private StateBuffer sb;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -123,18 +128,13 @@ public class Main implements IAppLogic {
                 // Bottom face
                 16, 18, 19, 17, 16, 19,
                 // Back face
-                4, 6, 7, 5, 4, 7,};
-        /*int[] indices = new int[]{
-                // Front face
-                0, 1, 3, 3, 1,
-                // Top Face
-//                8, 10, 11, 9, 8,
-                // Right face
-//                12, 13, 7, 5, 12,
-        };*/
+                4, 6, 7, 5, 4, 7
+        };
+
         Texture texture = scene.getTextureCache().createTexture("resources/models/cube/pyro.png");
         Material material = new Material();
         material.setTexturePath(texture.getTexturePath());
+
         List<Material> materialList = new ArrayList<>();
         materialList.add(material);
 
@@ -144,12 +144,60 @@ public class Main implements IAppLogic {
         Model cubeModel = new Model("cube-model", materialList);
         scene.addModel(cubeModel);
 
-//        Model cubeModel2 = new Model("cube-model", materialList);
-//        scene.addModel(cubeModel2);
+
+        /*double[] positionsT = new double[]{
+                -0.5f, 0.5f, -1.0f,
+                -0.5f, -0.5f, -1.0f,
+                0.5f, -0.5f, -1.0f,
+                0.5f, 0.5f, -1.0f,
+        };
+
+        int[] indicesT = new int[]{
+                0, 1, 3, 3, 1, 2,
+        };
+
+        Material materialT = new Material();
+        Mesh meshT = new Mesh(positionsT, new double[]{}, indicesT);
+        materialT.getMeshList().add(meshT);
+        List<Material> materialListT = new ArrayList<>();
+        materialListT.add(materialT);
+//        materialList.add(materialT);
+        Model modelT = new Model("quad", materialList);
+        scene.addModel(modelT);
+        var triangle = new Entity("quad-entity", modelT.getId());
+        triangle.setPosition(0, 0, -5);
+        triangle.updateModelMatrix();*/
 
         cubeEntity = new Entity("cube-entity", cubeModel.getId());
-        cubeEntity.setPosition(0, 0, -2);
+
+
+        var cst = new ConstState(1d, 0.9d, cubeEntity, new Vector4d(1.d, 3, 0.d, 4));
+        var dst = new DynamicState(
+                cst, new Quaterniond(),
+                new Vector3d(-2, 1, -5),    // pos
+                new Vector3d(0., -5, 0.),  // vel
+                new Vector3d(0., -1, 0.),  // acc
+                new Vector3d(0, 0, 0)                 // whirl
+        );
+        var stepQ = new RK4_Quat();
+        var stepV = new RK4_Vector3();
+
+        var st = new SystemState(cst, dst);
+
+        var inv_step = 10;
+        var sm = new SystemModeler(st, stepV, stepQ, 180d, 1.d / inv_step);
+
         scene.addEntity(cubeEntity);
+
+        sm.modeling();
+        var tempBuffer = sm.getBuffer();
+        this.sb = new StateBuffer(tempBuffer.getNext());
+        for (int i = 0; !tempBuffer.IsEnd(); i++) {
+            var ss = tempBuffer.getNext();
+            if (i % inv_step != 0) continue;
+            this.sb.add(ss);
+        }
+        System.out.println("Peace");
     }
 
 
@@ -188,16 +236,17 @@ public class Main implements IAppLogic {
 
     @Override
     public void update(Window window, Scene scene, long diffTimeMillis) {
-        rotation = (rotation + 1.5f * 4) % 360;
-        time_pos++;
+        if (sb.IsEnd()) {
+            sb.restart();
+            return;
+        }
 
-        double radius = 0.7f;
-        double speed = 0.05f;
-        double x = radius * sin(time_pos * speed);
-        double y = radius * cos(time_pos * speed);
-//        rotation = (rotation + additive) % 360;
-        cubeEntity.setRotation(1, 1, 0, Math.toRadians(rotation));
-        cubeEntity.setPosition(2 * x, y, y - 10 * radius);
+        var s = sb.getNext();
+
+        var pos = s.getDynamicState().getX();
+        var rot = s.getDynamicState().getQ();
+        cubeEntity.setPosition(pos.x, pos.y, pos.z);
+        cubeEntity.setRotation(rot);
         cubeEntity.updateModelMatrix();
     }
 }

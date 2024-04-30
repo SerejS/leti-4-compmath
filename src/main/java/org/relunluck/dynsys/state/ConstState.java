@@ -16,16 +16,17 @@ public class ConstState {
     public ConstState(double mass, double eps, Entity cube, Vector4d plane) {
         this.mass = mass;
         this.plane_coef = eps;
-        this.plane = new Vector4d(plane);
-        this.pseudo_plane = new Vector4d(plane);
+        this.plane = new Vector4d(plane.normalize3());
+        this.pseudo_plane = new Vector4d(this.plane);
         double scale = cube.getScale();
-        pseudo_plane.w -= scale * Math.sqrt(3);
+        pseudo_plane.w -= scale * Math.sqrt(3) / 2;
         I_body = new SimpleMatrix(new double[3][3]);
         I_body_inv = new SimpleMatrix(new double[3][3]);
         for (int i = 0; i < 3; i++) {
             I_body.set(i, i, scale * scale * 2 * mass / 12);
             I_body_inv.set(i,i, 1 / I_body.get(i, i));
         }
+        this.vertices = new SimpleMatrix(3, 8);
         for (int i=0; i < 8; i++){
             vertices.set(0, i, i % 2 == 0 ? scale / 2: -scale / 2);
             vertices.set(1, i, (i / 2) % 2 == 0 ? scale / 2: -scale / 2);
