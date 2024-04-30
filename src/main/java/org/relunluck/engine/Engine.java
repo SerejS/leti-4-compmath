@@ -19,6 +19,7 @@ public class Engine {
             resize();
             return null;
         });
+
         targetFps = opts.fps;
         targetUps = opts.ups;
         this.appLogic = appLogic;
@@ -41,10 +42,10 @@ public class Engine {
 
     private void run() {
         long initialTime = System.currentTimeMillis();
-        float timeU = 1000.0f / targetUps;
-        float timeR = targetFps > 0 ? 1000.0f / targetFps : 0;
-        float deltaUpdate = 0;
-        float deltaFps = 0;
+        double timeU = 1000.0d / targetUps;
+        double timeR = targetFps > 0 ? 1000.0d / targetFps : 0;
+        double deltaUpdate = 0;
+        double deltaFps = 0;
 
         long updateTime = initialTime;
         while (running && !window.windowShouldClose()) {
