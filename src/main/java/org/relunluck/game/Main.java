@@ -20,6 +20,7 @@ import static java.lang.Math.*;
 public class Main implements IAppLogic {
 
     private Entity cubeEntity;
+    private Entity flatEntity;
     private StateBuffer sb;
 
     public static void main(String[] args) {
@@ -35,7 +36,41 @@ public class Main implements IAppLogic {
 
     @Override
     public void init(Window window, Scene scene, Render render) {
-        double[] positions = new double[]{
+        var flatVector = new Vector4d(1.d, 3, 0.d, 3);
+
+        double left = -16f;
+        double right = 16f;
+        double[] flatPositions = new double[]{
+                left, (-flatVector.x * left - flatVector.w) / flatVector.y, -32.0f, //upL
+                left, (-flatVector.x * left - flatVector.w) / flatVector.y, 0.0f, //downL
+                right, (-flatVector.x * right - flatVector.w) / flatVector.y, 0.0f, //downR
+                right, (-flatVector.x * right - flatVector.w) / flatVector.y, -32.0f, //upR
+        };
+        double[] flatTex = new double[]{
+                0.0f, 0.0f,
+                0.0f, 1f,
+                1f, 1f,
+                1f, 0.0f,
+        };
+        int[] flatIndices = new int[]{0, 1, 3, 3, 1, 2};
+        var flatTexture = scene.getTextureCache().createTexture("resources/models/flat/flat.png");
+        var flatMaterial = new Material();
+        flatMaterial.setTexturePath(flatTexture.getTexturePath());
+        List<Material> flatMaterialList = new ArrayList<>();
+        flatMaterialList.add(flatMaterial);
+        var flatMesh = new Mesh(flatPositions, flatTex, flatIndices);
+        flatMaterial.getMeshList().add(flatMesh);
+        Model flatModel = new Model("flat-model", flatMaterialList);
+
+        flatEntity = new Entity("flat-entity", flatModel.getId());
+        flatEntity.updateModelMatrix();
+
+        scene.addModel(flatModel);
+
+        scene.addEntity(flatEntity);
+
+
+        double[] cubePositions = new double[]{
                 // V0
                 -0.5f, 0.5f, 0.5f,
                 // V1
@@ -85,7 +120,7 @@ public class Main implements IAppLogic {
                 // V19: V2 repeated
                 0.5f, -0.5f, 0.5f,
         };
-        double[] textCoords = new double[]{ // Texture
+        double[] cubeTexCoords = new double[]{ // Texture
                 0.0f, 0.0f,
                 0.0f, 0.5f,
                 0.5f, 0.5f,
@@ -116,7 +151,7 @@ public class Main implements IAppLogic {
                 0.5f, 0.5f,
                 1.0f, 0.5f,
         };
-        int[] indices = new int[]{
+        int[] cubeIndices = new int[]{
                 // Front face
                 0, 1, 3, 3, 1, 2,
                 // Top Face
@@ -131,47 +166,23 @@ public class Main implements IAppLogic {
                 4, 6, 7, 5, 4, 7
         };
 
-        Texture texture = scene.getTextureCache().createTexture("resources/models/cube/pyro.png");
-        Material material = new Material();
-        material.setTexturePath(texture.getTexturePath());
+        Texture cubeTex = scene.getTextureCache().createTexture("resources/models/cube/pyro.png");
+        Material cubeMaterial = new Material();
+        cubeMaterial.setTexturePath(cubeTex.getTexturePath());
 
-        List<Material> materialList = new ArrayList<>();
-        materialList.add(material);
+        List<Material> cubeMatList = new ArrayList<>();
+        cubeMatList.add(cubeMaterial);
 
-        Mesh mesh = new Mesh(positions, textCoords, indices);
-        material.getMeshList().add(mesh);
+        Mesh cubeMesh = new Mesh(cubePositions, cubeTexCoords, cubeIndices);
+        cubeMaterial.getMeshList().add(cubeMesh);
 
-        Model cubeModel = new Model("cube-model", materialList);
+        Model cubeModel = new Model("cube-model", cubeMatList);
+        cubeEntity = new Entity("cube-entity", cubeModel.getId());
+
         scene.addModel(cubeModel);
 
 
-        /*double[] positionsT = new double[]{
-                -0.5f, 0.5f, -1.0f,
-                -0.5f, -0.5f, -1.0f,
-                0.5f, -0.5f, -1.0f,
-                0.5f, 0.5f, -1.0f,
-        };
-
-        int[] indicesT = new int[]{
-                0, 1, 3, 3, 1, 2,
-        };
-
-        Material materialT = new Material();
-        Mesh meshT = new Mesh(positionsT, new double[]{}, indicesT);
-        materialT.getMeshList().add(meshT);
-        List<Material> materialListT = new ArrayList<>();
-        materialListT.add(materialT);
-//        materialList.add(materialT);
-        Model modelT = new Model("quad", materialList);
-        scene.addModel(modelT);
-        var triangle = new Entity("quad-entity", modelT.getId());
-        triangle.setPosition(0, 0, -5);
-        triangle.updateModelMatrix();*/
-
-        cubeEntity = new Entity("cube-entity", cubeModel.getId());
-
-
-        var cst = new ConstState(1d, 0.9d, cubeEntity, new Vector4d(1.d, 3, 0.d, 4));
+        var cst = new ConstState(1d, 0.3d, cubeEntity, flatVector);
         var dst = new DynamicState(
                 cst, new Quaterniond(),
                 new Vector3d(-2, 1, -5),    // pos
@@ -184,7 +195,7 @@ public class Main implements IAppLogic {
 
         var st = new SystemState(cst, dst);
 
-        var inv_step = 10;
+        var inv_step = 1000;
         var sm = new SystemModeler(st, stepV, stepQ, 180d, 1.d / inv_step);
 
         scene.addEntity(cubeEntity);
@@ -197,49 +208,19 @@ public class Main implements IAppLogic {
             if (i % inv_step != 0) continue;
             this.sb.add(ss);
         }
-        System.out.println("Peace");
+//        System.out.println("Peace");
     }
 
 
     // Возможность управления с клавиатуры
     @Override
     public void input(Window window, Scene scene, long diffTimeMillis) {
-        /*displInc.zero();
-
-        if (window.isKeyPressed(GLFW_KEY_UP)) {
-            displInc.y = 1;
-        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
-            displInc.y = -1;
-        }
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) {
-            displInc.x = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
-            displInc.x = 1;
-        }
-        if (window.isKeyPressed(GLFW_KEY_A)) {
-            displInc.z = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_Q)) {
-            displInc.z = 1;
-        }
-        if (window.isKeyPressed(GLFW_KEY_Z)) {
-            displInc.w = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_X)) {
-            displInc.w = 1;
-        }
-
-        displInc.mul(diffTimeMillis / 1000.0f);
-
-        Vector3d entityPos = cubeEntity.getPosition();
-        cubeEntity.setPosition(displInc.x + entityPos.x, displInc.y + entityPos.y, displInc.z + entityPos.z);
-        cubeEntity.setScale(cubeEntity.getScale() + displInc.w);*/
     }
 
     @Override
     public void update(Window window, Scene scene, long diffTimeMillis) {
-        if (sb.IsEnd()) {
-            sb.restart();
-            return;
-        }
+        if (sb.IsEnd()) sb.restart();
+
 
         var s = sb.getNext();
 
@@ -248,5 +229,6 @@ public class Main implements IAppLogic {
         cubeEntity.setPosition(pos.x, pos.y, pos.z);
         cubeEntity.setRotation(rot);
         cubeEntity.updateModelMatrix();
+
     }
 }
