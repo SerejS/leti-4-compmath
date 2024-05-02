@@ -25,7 +25,7 @@ public class Main implements IAppLogic {
 
     public static void main(String[] args) {
         Main main = new Main();
-        Engine gameEng = new Engine("chapter-07", new Window.WindowOptions(), main);
+        Engine gameEng = new Engine("Fall Modeling", new Window.WindowOptions(), main);
         gameEng.start();
     }
 
@@ -36,7 +36,7 @@ public class Main implements IAppLogic {
 
     @Override
     public void init(Window window, Scene scene, Render render) {
-        var flatVector = new Vector4d(1.d, 3, 0.d, 3);
+        var flatVector = new Vector4d(0.0d, 3, 0.d, +8);
 
         double left = -16f;
         double right = 16f;
@@ -182,21 +182,21 @@ public class Main implements IAppLogic {
         scene.addModel(cubeModel);
 
 
-        var cst = new ConstState(1d, 0.3d, cubeEntity, flatVector);
+        var cst = new ConstState(10d, 0.5, cubeEntity, flatVector);
         var dst = new DynamicState(
                 cst, new Quaterniond(),
-                new Vector3d(-2, 1, -5),    // pos
-                new Vector3d(0., -5, 0.),  // vel
-                new Vector3d(0., -1, 0.),  // acc
-                new Vector3d(0, 0, 0)                 // whirl
+                new Vector3d(0, 5, -5),   // pos
+                new Vector3d(0., -10, 0.), // vel
+                new Vector3d(0., -10, 0.),  // acc
+                new Vector3d(0.0, 0.0, 0)     // whirl
         );
         var stepQ = new RK4_Quat();
         var stepV = new RK4_Vector3();
 
         var st = new SystemState(cst, dst);
 
-        var inv_step = 1000;
-        var sm = new SystemModeler(st, stepV, stepQ, 180d, 1.d / inv_step);
+        var inv_step = 100;
+        var sm = new SystemModeler(st, stepV, stepQ, 500, 1.d / inv_step);
 
         scene.addEntity(cubeEntity);
 
@@ -205,22 +205,19 @@ public class Main implements IAppLogic {
         this.sb = new StateBuffer(tempBuffer.getNext());
         for (int i = 0; !tempBuffer.IsEnd(); i++) {
             var ss = tempBuffer.getNext();
-            if (i % inv_step != 0) continue;
+            if (i % (inv_step) != 0) continue;
             this.sb.add(ss);
         }
-//        System.out.println("Peace");
     }
 
 
     // Возможность управления с клавиатуры
     @Override
-    public void input(Window window, Scene scene, long diffTimeMillis) {
-    }
+    public void input(Window window, Scene scene, long diffTimeMillis) {}
 
     @Override
     public void update(Window window, Scene scene, long diffTimeMillis) {
         if (sb.IsEnd()) sb.restart();
-
 
         var s = sb.getNext();
 
@@ -229,6 +226,5 @@ public class Main implements IAppLogic {
         cubeEntity.setPosition(pos.x, pos.y, pos.z);
         cubeEntity.setRotation(rot);
         cubeEntity.updateModelMatrix();
-
     }
 }

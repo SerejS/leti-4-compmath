@@ -74,7 +74,7 @@ public class DynamicState {
 
     public void changeI(ConstState cstate) {
         SimpleMatrix R = quatToMatrix(q);
-        SimpleMatrix R_inv = R.transpose();
+        SimpleMatrix R_inv = R.invert();
         this.I = R.mult(cstate.getI_body()).mult(R_inv);
         this.I_inv = R.mult(cstate.getI_body_inv()).mult(R_inv);
     }
@@ -115,6 +115,19 @@ public class DynamicState {
         return x;
     }
 
+    @Override
+    public String toString() {
+        return "DynamicState{" +
+                " \n t=" + t +
+                ",\n q=" + q +
+                ",\n x=" + x +
+                ",\n v=" + v +
+                ",\n a=" + a +
+                ",\n w=" + w +
+//                ", I=" + I +
+//                ", I_inv=" + I_inv +
+                '}';
+    }
 }
 
 

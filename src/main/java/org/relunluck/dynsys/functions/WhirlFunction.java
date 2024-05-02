@@ -1,6 +1,7 @@
 package org.relunluck.dynsys.functions;
 
-import org.joml.*;
+import org.joml.Quaterniond;
+import org.joml.Vector3d;
 
 public class WhirlFunction implements Function<Quaterniond> {
     private Vector3d w;
@@ -9,9 +10,7 @@ public class WhirlFunction implements Function<Quaterniond> {
     }
     @Override
     public Quaterniond calculate(double t, Quaterniond x) {
-        Quaterniond res = new Quaterniond();
-        x.mul( w.x, w.y, w.z, 0, res);
+        Quaterniond res = (new Quaterniond( w.x, w.y, w.z, 0)).mul(x);
         return res.mul(new Quaterniond(0, 0, 0, 0.5));
-
     }
 }
