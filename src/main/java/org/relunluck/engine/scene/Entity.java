@@ -46,10 +46,10 @@ public class Entity {
         return scale;
     }
 
-    public final void setPosition(double x, double y, double z) {
-        position.x = x;
-        position.y = y;
-        position.z = z;
+    public final void setPosition(Vector3d vector) {
+        position.x = vector.x;
+        position.y = vector.y;
+        position.z = vector.z;
     }
 
     public void setRotation(double x, double y, double z, double angle) {
